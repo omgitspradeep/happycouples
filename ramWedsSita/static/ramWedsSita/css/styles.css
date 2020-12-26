@@ -687,3 +687,8 @@ margin-top:30px;
 
 
 /*  temp */
+.trans-btn { 
+	cursor: pointer; 
+	background-color: transparent; 
+	color: #3498db; 
+} 

@@ -1,91 +1,518 @@
-{%for wish in wishes %}
+<!DOCTYPE html>
+{% load static %}
+{% get_static_prefix as STATIC_PREFIX %}
 
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="">
+<meta name="author" content="webthemez">
+<title>Ram weds sita|{{inviteeObj.name}}</title>
+
+<!-- Bootstrap core CSS -->
+<link href="{% static 'ramWedsSita/css/bootstrap.css' %}" rel="stylesheet">
+
+<!-- Custom CSS -->
+<link href="{% static 'ramWedsSita/css/styles.css' %}" rel="stylesheet">
+<link href="{% static 'ramWedsSita/css/font-awesome.min.css' %}" rel="stylesheet">
+<link href="{% static 'ramWedsSita/css/animate-custom.css' %}" rel="stylesheet"> 
+<script src="{% static 'ramWedsSita/js/jquery.min.js' %}" ></script>
+<script type="text/javascript" src="{% static 'ramWedsSita/js/modernizr.custom.js' %}"></script>
+<!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries --> 
+<!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js'></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js'></script>
+    <![endif]-->
+
+
+
+<!-- Java script for form validation-->
+<script>
+
+//Code of ajax
+
+$(document).ready(function(){
+
+    // If User has already wished then Hide the Wish Submitting form
+    {% if alreadyWished is 1 %}
+      $("#wishFormSection").hide();
+    {% endif %}
+
+    $("#wishDelBtn").click(function(){
+
+      const xhr=new XMLHttpRequest();
+      xhr.open("GET","{% url 'home' %}",true);
+      xhr.responseType="json";
+      xhr.onload=()=>{
+        if(xhr.status === 200){
+          console.log(xhr.response.status);
+
+          if (xhr.response.status=="1"){
+
+          // Remove the Deleted Wish 
+          $(this).closest('.card').fadeOut(2400, function(){
+            $(this).remove();
+          });
+          // Show the Wish form to accept Wishes
+          $("#wishFormSection").fadeOut(500, function(){
+            $(this).fadeIn(2500);
+
+          });
+          }
+
+
+
+
+
+        }else{
+          console.log("Some thing went wrong....");
+        }
+      };
+      xhr.send();
+
+
+
+
+
+  });
+
+});
+
+
+function validate() {
+
+  var wish =  document.wishForm.wishField.value.trim(); 
+  if( wish.length < 3 ) {
+     alert( "Please provide your wishes" );
+     document.wishForm.wishField.focus() ;
+     return false;
+  }
+  return( true );
+}
+
+// Code for raining animation
+var count=0;   // 0: !raining &  1: raining
+var createHeartVar='';
+function createHeart(){
+
+    const heart = document.createElement('div');
+    heart.classList.add('heart');
+
+    heart.style.left = Math.random() * 100 + "vw";
+	  heart.style.color=`hsl(${Math.floor(Math.random()*360)}, 100%, 50%)`;
+
+    // to make animation between 2 to 5 seconds
+    heart.style.animationDuration = Math.random()*2 +3 +"s"
+    heart.innerText='🇳🇵🇳🇵 सिता ♥️ राम 🇳🇵🇳🇵';
+    document.body.appendChild(heart);
+
+    setTimeout(()=>{
+        heart.remove();
+    },5000);
+}
+function heartController(){
+  if (count === 0){
+    count=1;
+    createHeartVar=setInterval(createHeart,300);
+  }else{
+    count=0;
+    clearInterval(createHeartVar);
+  }
+
+}
+
+//setInterval(createHeart,300)
+
+// CODE TO REMEMBER CLICKED IMAGES OF GALLERY
+function onGalleryImageClicked(location,title,desc){
+  document.querySelector(".modal-title").innerHTML=title;
+  document.querySelector("#modal-desc").innerHTML=desc;
+  document.querySelector("#modal-image").src="{{STATIC_PREFIX}}"+location;
+
+}
+
+
+
+</script> 
+
+</head>
+<body data-target="#navbar-main">
+<div id="navbar-main"> 
+  <!-- Fixed navbar -->
+  <div class="navbar navbar-inverse navbar-fixed-top">
+    <div class="container">
+	 
+      <div class="navbar-header">
+	   <div class="pull-left logo">
+        <a class="" onhover = "cursor: pointer;" onclick = "return(heartController());"><img src="{% static 'ramWedsSita/images/sitaram.gif' %}" /></a>
+       </div>
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse"> <span class="icon-bar"></span> <span class="icon-bar"></span> <span class="icon-bar"></span> </button>
+        </div>
+      <div class="navbar-collapse collapse">
+        <ul class="nav navbar-nav pull-right">
+          <li><a href="#home-section" class="smoothScroll">Welcome</a></li>
+          <li> <a href="#services" class="smoothScroll">Events</a></li>		  
+          <li> <a href="#about" class="smoothScroll"> About Us</a></li>
+          <li> <a href="#portfolio" class="smoothScroll"> Gallery</a></li>
+          <li> <a href="#team" class="smoothScroll">Testimonials</a></li>
+          <li> <a href="#contact" class="smoothScroll"> Place</a></li>
+          <li> <a href="#wishes" class="smoothScroll"> Wishes</a></li>
+        </ul>
+        </ul>
+      </div>
+      <!--/.nav-collapse --> 
+    </div>
+  </div>
+</div>
+
+
+
+
+<!-- ==== HEADERWRAP ==== -->
+<div id="home-section">
+<div id="headerwrap" name="home">
+  <header class="clearfix tb"> 
+	</header>
+</div>
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-12 tb-cell text-center"> 
+         <h1>Ram & Sita </h1>
+        <p>We are getting Married on 20.12.2020 </p>
+	    </div>
+	  </div>
+	</div>
+</div> 
+<!-- /headerwrap --> 
+
+
+
+
+
+<!-- ==== SERVICES ==== -->
+<div id="services" name="services">
+  <div class="container">
+    <div class="row">
+      <h2 class="centered">EVENTS</h2>
+      <hr>
+      <div class="col-lg-8 col-lg-offset-2">
+        <p class="large">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Aut eaque, laboriosam veritatis, quos non quis ad perspiciatis, totam corporis ea, alias ut unde.</p>
+      </div>
+      <div class="col-lg-4 callout"> <i class="fa fa-users fa-3x"></i>
+        <h3>Engagement</h3>
+        <p> Friday, 2077 - 08 - 26 (11<sup>th</sup> December 2020)</p>
+      </div>
+      <div class="col-lg-4 callout"> <i class="fa fa-bell fa-3x"></i>
+        <h3>Wedding Day</h3>
+        <p>Sunday, 2077 - 09 - 05 (20<sup>th</sup> December 2020) <br/>
+        Janti Prasthan - 10 a.m <br/>
+        Suddhodhan-3, Bethani, Rupandehi
+        </p>
+
+      </div>
+      <div class="col-lg-4 callout"> <i class="fa fa-star fa-3x"></i>
+        <h3>Reception</h3>
+        <p>Tuesday, 2077 - 09 - 07 (22<sup>nd</sup> December 2020)<br/>
+        From 3 P.M. to 8 P.M. <br/>
+        Riddi Siddhi Party Palace, Suddhodhan-1, Pharsatikar
+        </p>
+      </div>
+    </div>
+    <!-- row --> 
+  </div>
+</div>
+<!-- container --> 
+<section class="hero-section section">  
+        <div class="container">
+            <div class="highlight tb">
+                <div class="tb-cell text-center">
+                  <div class="row col-sm-5">
+                      <p><b>{{inviteeObj.gender}} {{inviteeObj.name}}</b>,</br>
+                      {{inviteeObj.address}}</p>
+                  </div>
+                  <div class="row col-sm-7 ">
+                     <h4 class="text-info"> {{inviteeObj.inviteeMessage}}</h4>
+
+                  </div>
+        
+                </div>
+            </div>
+        </div>
+		
+    </section>
+	<div class="div-pattern"></div>
+
+
+
+
+<!-- ==== ABOUT ==== -->
+<div id="about" name="about">
+  <div class="container">
+    <div class="row white">
+      <h2 class="centered">ABOUT US</h2>
+      <hr>
+      <div class="col-md-6"> <img class="img-responsive" src="{% static 'ramWedsSita/images/about/about1.jpg' %}" align=""> </div>
+      <div class="col-md-6">
+        <h3>Groom</h3>
+        <p >Hi! I am Ram Sharma currently pursing my job at Yeti International. I have completed my masters in MBA and bachelors in Computer Science.<br/>
+       <b><i>Suddhodhan-3, Bethani, Rupandehi</i></b></p>
+        
+        <h3>Bride</h3>
+        <p>Hi! I am Neha Dahal currently working as leading architect in Lumbini Provinance. I have completed my masters in Civil Engineering from Oxford university.<br/>
+        <b><i>Butwal-18, Bethani, Rupandehi</i></b></p>
+      </div>
+    </div>
+    <!-- row --> 
+  </div>
+</div>
+
+
+
+<!-- ==== PORTFOLIO ==== -->
+<div id="portfolio" name="portfolio">
+    <div class="container">
+        <div class="row">
+          <h2 class="centered">GALLERY</h2>
+          <hr>
+            <div class="col-lg-8 col-lg-offset-2 centered">
+                <p class="large">These photos we shared with you are the best captured moments of our lives. We are looking forward to even more happy moments together.</p>
+            </div>
+        </div>
+
+        <!-- /row -->
+        <div class="container">
+            <div class="row"> 
+                <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                                <h4 class="modal-title">Cake</h4>
+                            </div>
+                            <div class="modal-body">
+                                <p><img id ="modal-image" class="img-responsive" ></p>
+                                <p id="modal-desc"> Lorem ipsum dolor sit amet, quo meis audire placerat eu, te eos porro veniam. An everti maiorum detracto mea. </p> 
+                            </div> 
+                        </div>
+                    <!-- /.modal-content --> 
+                    </div>
+                  <!-- /.modal-dialog --> 
+                </div>
+                <!-- /.modal --> 
+
+
+                {%for key,value in gallery.items%}
+
+                    <!-- PORTFOLIO IMAGE 1 -->
+                    <div class="col-md-4 ">
+                      <div class="grid overlay">
+                        <figure> <img class="img-responsive" src="{{STATIC_PREFIX}}{{value.image}}" alt="">
+                          <figcaption>
+                            <h5>{{key}}</h5>
+                            <a data-toggle="modal" href="#myModal" onclick="return(onGalleryImageClicked('{{value.image}}','{{key}}','{{value.desc}}'));" class="btn btn-default">More Details</a> </figcaption>
+                          <!-- /figcaption --> 
+                        </figure>
+                        <!-- /figure --> 
+                      </div>
+                      <!-- /grid-overlay --> 
+                    </div> 
+
+                {%endfor%}
+
+              <!-- /col --> 
+            </div>
+          <!-- /row --> 
+        </div>
+      <!-- /row --> 
+    </div>
+</div>
+<!-- /container --> 
+
+
+
+
+
+<!-- ==== TEAM MEMBERS ==== -->
+<div id="team" name="team">
+  <div class="container">
+    <div class="row centered">
+      <h2 class="centered">TESTIMONIALS</h2>
+      <hr>
+	    <div class="col-lg-8 col-lg-offset-2 centered">
+        <p>No relationship is all sunshine, but two people can share one umbrella and survive the storm together.</p>
+		    <br/>
+      </div>
+      
+      {%for keys,values in testi.dadmom.items%}
+        <div class="col-lg-3 centered"> <img class="img img-circle" src="{{STATIC_PREFIX}}{{values.image}}" height="120px" width="120px" alt="">
+        <h4><strong>{{values.name}}</strong></h4>
+        <p>  {{values.desc}}</p>  </div>
+      {%endfor%}
+
+
+
+    </div>
+    <br/>
+
+
+      <table class="table ">
+
+        {%for keys,values in testi.others.items%}
+          <thead>
+            <tr>
+              <th scope="col" class="text-body">{{keys}}</th>
+              <th scope="col" style="font-size: 1.4rem;">{{values}} </th>
+            </tr>
+          </thead>
+        {%endfor%}
+      
+      </table>
+
+
+
+  </div>
+  <!-- row --> 
+</div>
+<!-- container --> 
+
+
+
+<!-- ==== CONTACT ==== -->
+<div id="contact" name="contact">
+  <div class="container">
+
+  
+    <div class="row">
+      <h2 class="centered">MEETING POINT</h2>
+      <hr>
+    </div>
+
+    <div class="row">
+      <div class="col-md-7">
+	      <strong>Ask how to Reach Us!</strong>
+        <p>Once you get Bethani, take Lumbini circuit road leading to West direction. Once you reach a Siyari river then take road towards North that leads directly to marriage location. </p>
+        
+
+        <!--Google map भेला स्थल-->
+
+        <div id="map-container-google-1" class="z-depth-1-half map-container" style="height: 500px">
+          <iframe src="https://maps.google.com/maps?q=27.626931778006565, 83.41662629452786&t=&z=13&ie=UTF8&iwloc=&output=embed" frameborder="0" style="border:0" allowfullscreen></iframe>
+        </div>
+
+        <!--Google Maps -->
+
+      </div>
+	    <div class="col-md-5">
+	         
+	      <i class="fa fa-map-marker fa-2x"></i>
+        <strong>Gautam Buddha Party Palace</strong>
+		    <p>Butwal-18, Bethani<br>Rupandehi,Nepal</p><br/> 
+	      <i class="fa fa-envelope-o fa-2x"></i>
+        <p>binary.science98@gmail.com</p><br/> 
+	      <i class="fa fa-phone fa-2x"></i>
+        <p> +977-9863949531</p>
+       
+	    </div>
+    </div>
+    <!-- row --> 
+    
+  </div>
+</div>
+
+
+<!-- ==== WISHES ==== -->
+<div id="wishes" name="wishes">
+  <div class="container">
+    <h2 class="centered">Your Best Wishes</h2>
+    <hr>
+              <!-- container --> 
+
+
+      <section class="hero-section section" id ="wishFormSection">  
+        <div class="container">
+          <div class="highlight tb">
+            <div class="tb-cell">
+              <form class="form-inline pull-center" name="wishForm" action="{% url 'home' %}" method="POST" onsubmit = "return(validate());">{% csrf_token %}
+
+                <div class="form-group">
+                  <textarea class="form-control " id="wishField" name="Wish" placeholder="Wishes . . . " rows="4" cols="50" required ></textarea>       
+                  <button class="btn btn-lg" id="btnwish" type="submit">Submit wish</button>
+                </div>
+                    
+              </form> 
+            </div>
+          </div>
+        </div>    
+      </section>
+       <!--<div class="div-pattern"></div> -->
+
+
+             <!-- Open a whole column of wish display -->
+
+
+
+    <div class="row" id="wishDisplaySection">
+
+    {% if wishes%}
+
+      {%for wish in wishes %}
         <div class="col-sm-4">
           <div class="card">
-            <div class="card-body">
-              <h4 class="card-title ">{{wish.name}}</h4>
-              <p class="card-text bg-success">{{wish.wishes}}</p>
+            <div class="card-body ">
+              <h4 class="card-title ">{{wish.invitee.name}}</h4>
+              <div class="card-text bg-success">
+
+                {{wish.wishes}}<br/>
+                {% if wish.invitee.secretCode == request.session.guestsession %}
+                  <a id="wishDelBtn" ><i class="fa fa-trash-o fa-2x"></i></a>
+                {% endif %}
+
+               </div>
             </div>
           </div>
         </div>
+      {%endfor%}
 
-{%endfor%}
+    {%endif%}
       
+            
 
 
+    </div>
+      <!-- Closes a whole column of wish display -->
+
+  </div>
+  <!-- loses row that includes title "Give Us Your Best Wishes" --> 
+    
+</div>
+<!-- Closes Initial div -->
 
 
-
-
-        <!-- PORTFOLIO IMAGE 2 -->
-        <div class="col-md-4">
-          <div class="grid overlay">
-            <figure> <img class="img-responsive" src="{% static 'ramWedsSita/images/portfolio/folio02.jpg' %}" alt="">
-              <figcaption>
-                <h5>Mindblow</h5>
-                <a data-toggle="modal" href="#myModal" class="btn btn-default">More Details</a> </figcaption>
-              <!-- /figcaption --> 
-            </figure>
-            <!-- /figure --> 
-          </div>
-          <!-- /grid-overlay --> 
-        </div>
-        
-        <!-- PORTFOLIO IMAGE 3 -->
-        <div class="col-md-4">
-          <div class="grid overlay">
-            <figure> <img class="img-responsive" src="{% static 'ramWedsSita/images/portfolio/folio03.jpg' %}" alt="">
-              <figcaption>
-                <h5>Awesome</h5>
-                <a data-toggle="modal" href="#myModal" class="btn btn-default">More Details</a> </figcaption>
-              <!-- /figcaption --> 
-            </figure>
-            <!-- /figure --> 
-          </div>
-          <!-- /grid-overlay --> 
-        </div>
+<!-- container -->
+<!-- *** Footer *** -->
+<div id="footerwrap">
+  <div class="container">
+    <div class="row">
+      <div class="col-md-8"> <span class="copyright">Love, laughter and happily ever after.</span> </div>
+      <div class="col-md-4">
+        <ul class="list-inline social-buttons">
+          <li><a href="#"><i class="fa fa-twitter fa-2x"></i></a> </li>
+          <li><a href="https://www.facebook.com/osho.international/"><i class="fa fa-facebook fa-2x"></i></a> </li>
+          <li><a href="https://www.youtube.com/watch?v=966WaMFgV1k"><i class="fa fa-youtube fa-2x"></i></a> </li>
+          <li><a href="#"><i class="fa fa-linkedin fa-2x"></i></a> </li>
+        </ul>
       </div>
-      <!-- /row --> 
-      
-      <!-- PORTFOLIO IMAGE 4 -->
-      <div class="row">
-        <div class="col-md-4 ">
-          <div class="grid overlay">
-            <figure> <img class="img-responsive" src="{% static 'ramWedsSita/images/portfolio/folio04.jpg' %}" alt="">
-              <figcaption>
-                <h5>Lovely</h5>
-                <a data-toggle="modal" href="#myModal" class="btn btn-default">More Details</a> </figcaption>
-              <!-- /figcaption --> 
-            </figure>
-            <!-- /figure --> 
-          </div>
-          <!-- /grid-overlay --> 
-        </div>
-        
-        <!-- PORTFOLIO IMAGE 5 -->
-        <div class="col-md-4">
-          <div class="grid overlay">
-            <figure> <img class="img-responsive" src="{% static 'ramWedsSita/images/portfolio/folio05.jpg' %}" alt="">
-              <figcaption>
-                <h5>Photos</h5>
-                <a data-toggle="modal" href="#myModal" class="btn btn-default">More Details</a> </figcaption>
-              <!-- /figcaption --> 
-            </figure>
-            <!-- /figure --> 
-          </div>
-          <!-- /grid-overlay --> 
-        </div>
-        
-        <!-- PORTFOLIO IMAGE 6 -->
-        <div class="col-md-4">
-          <div class="grid overlay">
-            <figure> <img class="img-responsive" src="{% static 'ramWedsSita/images/portfolio/folio06.jpg' %}" alt="">
-              <figcaption>
-                <h5>Reception</h5>
-                <a data-toggle="modal" href="#myModal" class="btn btn-default">More Details</a> </figcaption>
-              <!-- /figcaption --> 
-            </figure>
-            <!-- /figure --> 
-          </div>
-          <!-- /grid-overlay --> 
-        </div>
+    </div>
+  </div>
+</div>
+
+<!-- Bootstrap core JavaScript
+    ================================================== --> 
+<!-- Placed at the end of the document so the pages load faster --> 
+<script type="text/javascript" src="{% static 'ramWedsSita/js/bootstrap.min.js' %}" ></script> 
+<script type="text/javascript" src="{% static 'ramWedsSita/js/jquery.easing.1.3.js' %}"></script> 
+<script type="text/javascript" src="{% static 'ramWedsSita/js/smoothscroll.js' %}"></script> 
+<script type="text/javascript" src="{% static 'ramWedsSita/js/custom-scripts.js' %}"></script>
+</body>
+</html>

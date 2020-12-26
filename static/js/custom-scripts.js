@@ -1,6 +1,4 @@
 $(document).ready(function(){
-
-    
     $('a.page-scroll').bind('click', function(event) {
          var $anchor = $(this);
          $('html, body').stop().animate({
@@ -8,17 +6,12 @@ $(document).ready(function(){
          }, 1500, 'easeInOutExpo');
          event.preventDefault();
      });
-
-
  });
  
-
  $('body').scrollspy({
      target: '.navbar-fixed-top'
  })
  
-
-
  $('.navbar-collapse ul li a').click(function() {
      $('.navbar-toggle:visible').click();
  });
