@@ -27,9 +27,9 @@ class Invitee(models.Model):
 
     def __str__(self):
         return self.name
-    
+
     def URL(self):
-        baseUrl="http://127.0.0.1:8000/a/"
+        baseUrl="http://127.0.0.1:8000/rs/"
         return baseUrl+self.secretCode
 
     

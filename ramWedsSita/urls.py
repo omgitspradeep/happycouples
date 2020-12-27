@@ -5,7 +5,7 @@ from .views import (
     )
 
 urlpatterns = [
-    path('', home, name='home'),
-    path('a/<str:inviteeCode>',index,name='index'),
+    path('<str:inviteeCode>/', index, name='index'),
+    path('',home,name='home'),
 
 ]

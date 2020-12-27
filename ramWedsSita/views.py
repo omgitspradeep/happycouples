@@ -7,28 +7,28 @@ from django.urls import reverse
 # Create your views here.
 
 gallery={
-    "Together":{
-                "image":"ramWedsSita/images/portfolio/folio01.jpg",
+    "Lovely":{
+                "image":"ramWedsSita/images/gallery/gallery01.jpg",
                 "desc":"The only exception is that you can call the window.print() method in the browser to print the content of the current window."
                 },    
-    "Engagement":{
-                "image":"ramWedsSita/images/portfolio/folio02.jpg",
+    "Awesome":{
+                "image":"ramWedsSita/images/gallery/gallery02.jpg",
                 "desc":"Lorem ipsum dolor, sit amet consectetur adipisicing elit. Labore architecto nobis voluptatum enim mollitia odit totam laudantium, quo reprehenderit nihil quis praesentium nam nulla veniam rerum in itaque quos dolor."
                 },
     "Cool":{
-                "image":"ramWedsSita/images/portfolio/folio03.jpg",
+                "image":"ramWedsSita/images/gallery/gallery03.jpg",
                 "desc":"Lorem ipsum dolor, sit amet consectetur adipisicing elit. Labore architecto nobis voluptatum enim mollitia odit totam laudantium, quo reprehenderit nihil quis praesentium nam nulla veniam rerum in itaque quos dolor."
                 },
-    "Awesome":{
-                "image":"ramWedsSita/images/portfolio/folio04.jpg",
+    "Engagement":{
+                "image":"ramWedsSita/images/gallery/gallery04.jpg",
                 "desc":"Lorem ipsum dolor, sit amet consectetur adipisicing elit. Labore architecto nobis voluptatum enim mollitia odit totam laudantium, quo reprehenderit nihil quis praesentium nam nulla veniam rerum in itaque quos dolor."
                 },
-    "Lovely":{
-                "image":"ramWedsSita/images/portfolio/folio05.jpg",
+    "Together":{
+                "image":"ramWedsSita/images/gallery/gallery05.jpg",
                 "desc":"Lorem ipsum dolor, sit amet consectetur adipisicing elit. Labore architecto nobis voluptatum enim mollitia odit totam laudantium, quo reprehenderit nihil quis praesentium nam nulla veniam rerum in itaque quos dolor."
                 },
-    "Reception":{
-                "image":"ramWedsSita/images/portfolio/folio06.jpg",
+    "Celebration":{
+                "image":"ramWedsSita/images/gallery/gallery06.jpg",
                 "desc":"Lorem ipsum dolor, sit amet consectetur adipisicing elit. Labore architecto nobis voluptatum enim mollitia odit totam laudantium, quo reprehenderit nihil quis praesentium nam nulla veniam rerum in itaque quos dolor."
                 }
     }
@@ -67,32 +67,11 @@ testimonials={
     }
 
 
-#Implement AJAX in frontend and remove redirection to index
-def home(request):
-    if request.method == 'POST': 
-        inviteeCode = getSessionID(request)
-        wish = request.POST.get('Wish')
-        invitedGuest=Invitee.objects.get(secretCode=inviteeCode)
-        print(f" ID: {inviteeCode} and WISH: {wish}")
-        Wisher.objects.create(invitee=invitedGuest,wishes=wish)
-        return HttpResponseRedirect(reverse('index',args=(inviteeCode,) ))
-
-    elif request.method == 'GET':
-        print("-------------INSIDE DELETE------------")
-        inviteeCode=getSessionID(request)
-        try:
-            inviteeObj=Invitee.objects.get(secretCode=inviteeCode)
-            Wisher.objects.get(invitee=inviteeObj).delete()
-            return JsonResponse({"status":"1","msg":"Successful"})  
-        except Exception as e:
-            return JsonResponse({"status":"0","msg":"Unsuccessful"})
-    else:
-        return HttpResponse("No page found")
-        
 
 def index(request, inviteeCode):
     try:
         invitedGuest=Invitee.objects.get(secretCode=inviteeCode)
+        print(f"Your id is :{inviteeCode} and {invitedGuest.name}")
         # Update the value to set the user has visited site.
         if not invitedGuest.siteVisited:
             invitedGuest.siteVisited=True
@@ -100,12 +79,12 @@ def index(request, inviteeCode):
         
         # We store seesion everytime. User visits landing page because they can request landing page from same browser appending different inviteeCode in url
         request.session['guestsession']=inviteeCode
-        print(f"Your id is :{inviteeCode}")
+        print(f"Your session is :{inviteeCode}")
 
     except Exception as e:
         # No user with requested inviteeCode
         print(e)
-        return HttpResponse("No page found")
+        return HttpResponse("No page found Index")
 
     wishes = Wisher.objects.all()
     if len(wishes) == 0:
@@ -113,6 +92,8 @@ def index(request, inviteeCode):
 
     # Has this invitee already wished? if so, don't show wish form in landing page.
     return render(request, "ramWedsSita/home.html",context={"wishes": wishes,"alreadyWished":alreadyWished(inviteeCode,wishes),"testi":testimonials, "gallery":gallery,"inviteeObj":invitedGuest})
+
+
 
 def alreadyWished(inviteeCode, wisherObjs):
     flag=0
@@ -122,5 +103,33 @@ def alreadyWished(inviteeCode, wisherObjs):
            break
     return flag
 
+
+
 def getSessionID(request):
     return request.session['guestsession']
+
+
+
+    #Implement AJAX in frontend and remove redirection to index
+def home(request):
+    if request.method == "POST":
+        print("-------------HOME POST------------")
+        inviteeCode = getSessionID(request)
+        wish = request.POST.get('Wish')
+        invitedGuest=Invitee.objects.get(secretCode=inviteeCode)
+        print(f" ID: {inviteeCode} and WISH: {wish}")
+        Wisher.objects.create(invitee=invitedGuest,wishes=wish)
+        return HttpResponseRedirect(reverse('index',args=(inviteeCode,) ))
+
+    elif request.method == "GET":
+        print("-------------HOME GET------------")
+        inviteeCode=getSessionID(request)
+        try:
+            inviteeObj=Invitee.objects.get(secretCode=inviteeCode)
+            Wisher.objects.get(invitee=inviteeObj).delete()
+            return JsonResponse({"status":"1","msg":"Successful"})  
+        except Exception as e:
+            return JsonResponse({"status":"0","msg":"Unsuccessful"})
+    else:
+        return HttpResponse("No page found GET")
+        
