@@ -29,7 +29,7 @@ class Invitee(models.Model):
         return self.name
 
     def URL(self):
-        baseUrl="http://127.0.0.1:8000/rs/"
+        baseUrl="https://happycouples.herokuapp.com/rs/"
         return baseUrl+self.secretCode
 
     
