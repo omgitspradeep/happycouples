@@ -1,8 +1,10 @@
 from django.shortcuts import render
 from django.http import HttpResponse,JsonResponse,HttpResponseRedirect
-from .models import Wisher,Invitee
+from .models import WisherRS,InviteeRS
 from rest_framework.renderers import JSONRenderer
 from django.urls import reverse
+from pyshorteners import Shortener
+from rest_framework.decorators import api_view
 
 # Create your views here.
 
@@ -133,3 +135,18 @@ def home(request):
     else:
         return HttpResponse("No page found GET")
         
+@api_view(['GET'])
+def getAllGuestData(request):
+    items=[]
+    guests = InviteeRS.objects.all()
+
+    for g in guests:
+        guestWish = g.getWishIfExists()
+        items.append({'name': g.name,'visited':g.siteVisited,'address':g.address, 'url':g.URL(),'message':g.inviteeMessage,'status':g.inviteStatus,'wish':guestWish})
+    
+    print(items)
+    return JsonResponse(items,safe=False)
+
+
+def shortenURL(longUrl):
+    return Shortener().clckru.short(longUrl)

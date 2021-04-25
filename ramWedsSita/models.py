@@ -13,7 +13,8 @@ GENDER_CHOICES =(
     ("Mr. ","Male"),("Ms. ","Female"),
 )
 
-class Invitee(models.Model):
+
+class InviteeRS(models.Model):
     name = models.CharField(max_length=20)
     gender = models.CharField(max_length=6,choices=GENDER_CHOICES)
     address = models.CharField(max_length=50)
@@ -29,7 +30,9 @@ class Invitee(models.Model):
         return self.name
 
     def URL(self):
-        baseUrl="https://happycouples.herokuapp.com/rs/"
+        #baseUrl="https://happycouples.herokuapp.com/rs/"
+        baseUrl="http://127.0.0.1:8000/rs"
+
         return baseUrl+self.secretCode
 
     
@@ -43,7 +46,7 @@ class Invitee(models.Model):
         failures = 0
         while not success:
             try:
-                super(Invitee, self).save(*args, **kwargs)
+                super(InviteeRS, self).save(*args, **kwargs)
             except IntegrityError:
                  failures += 1
                  if failures > 5: # or some other arbitrary cutoff point at which things are clearly wrong
@@ -55,23 +58,32 @@ class Invitee(models.Model):
             else:
                  success = True
 
+    # To get wishes by Invitees if exists.
+    def getWishIfExists(self):
+        wish = WisherRS.objects.filter(invitee=self)
+        if(wish.exists()):
+            return wish[0].wishes
+        else: 
+            return ""
+      
 
-class Wisher(models.Model):
+class WisherRS(models.Model):
     # When we delete Invitee, then both Wisher and Invitee will be deleted.
-    invitee = models.OneToOneField(Invitee,on_delete=models.CASCADE)
+    invitee = models.OneToOneField(InviteeRS,on_delete=models.CASCADE)
     wishes = models.CharField(max_length=500)
     posted = models.DateTimeField(auto_now=True)
 
     def Name(self):
         return self.invitee.name
     
-    def Invitee(self):
+    def InviteeRS(self):
         return self.invitee
+
 
 def generateSecretCode():
     random = secrets.token_hex(16)
     # Get all the secretCodes to verify
-    all= [obj.secretCode for obj in Invitee.objects.all()]
+    all= [obj.secretCode for obj in InviteeRS.objects.all()]
     if random in all:
         generateSecretCode()
     else:

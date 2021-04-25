@@ -2,8 +2,7 @@ from django.contrib import admin
 from django.contrib.admin import AdminSite
 import csv
 from django.http import HttpResponse
-from .models import Wisher, Invitee
-
+from .models import WisherRS, InviteeRS
 
 # Class to implement action that get all records for us in csv file
 class ExportCsvMixin:
@@ -24,7 +23,7 @@ class ExportCsvMixin:
 # Register your models here.
 #admin.site.register(Invitee)
 
-@admin.register(Invitee)
+@admin.register(InviteeRS)
 class InviteeAdmin(admin.ModelAdmin, ExportCsvMixin):
     list_display=('id','name','gender','address','inviteStatus','inviteeMessage','siteVisited','URL')
     actions = ["export_url_as_csv"]
@@ -39,6 +38,6 @@ class InviteeAdmin(admin.ModelAdmin, ExportCsvMixin):
 
 
 
-@admin.register(Wisher)
+@admin.register(WisherRS)
 class WisherAdmin(admin.ModelAdmin):
-    list_display=('id','Invitee','wishes','posted')
+    list_display=('id','InviteeRS','wishes','posted')

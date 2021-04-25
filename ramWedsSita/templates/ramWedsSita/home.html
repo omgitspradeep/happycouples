@@ -1,4 +1,4 @@
-{% extends 'base.html' %}
+{% extends 'rs-base.html' %}
 {% load static %}
 {% get_static_prefix as STATIC_PREFIX %}
 
@@ -11,6 +11,8 @@
 Ram weds sita|{{inviteeObj.name}}
 
 {%endblock title%}
+
+
 
 <!-- ==== JAVASCRIPT ==== -->
 {%block writescript%}
@@ -28,7 +30,10 @@ $(document).ready(function(){
     $("#wishDelBtn").click(function(){
 
       const xhr=new XMLHttpRequest();
-      xhr.open("GET","{% url 'home' %}",true);
+      xhr.open("GET","{% url 'home-rs' %}",true);
+
+      console.log(xhr.response.status);
+      
       xhr.responseType="json";
       xhr.onload=()=>{
         if(xhr.status === 200){
@@ -54,6 +59,8 @@ $(document).ready(function(){
       xhr.send();
 
   });
+
+  
 
 });
 
@@ -134,6 +141,8 @@ function onGalleryImageClicked(location,title,desc){
     <li> <a href="#team" class="smoothScroll">Testimonials</a></li>
     <li> <a href="#contact" class="smoothScroll"> Place</a></li>
     <li> <a href="#wishes" class="smoothScroll"> Wishes</a></li>
+    <li> <a href="{% url 'hindu-blog' %}"> Blogs</a></li>
+
   </ul>
 </div>
 
@@ -151,14 +160,17 @@ function onGalleryImageClicked(location,title,desc){
 
 
 
-
-<!-- ==== SERVICES ==== -->
+<!-- ==== EVENTS ==== -->
 
 {%block services%}
   <h2 class="centered">EVENTS</h2>
   <hr>
   <div class="col-lg-8 col-lg-offset-2">
-    <p class="large">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Aut eaque, laboriosam veritatis, quos non quis ad perspiciatis, totam corporis ea, alias ut unde.</p>
+    <img src="{% static 'ramWedsSita/images/ganesh.png' %}" alt="Ganesh Image" width="200" height="200">
+    <h3> वक्रतुंड महाकाय कोटिसूर्यसमप्रभ । निर्विघ्नं कुरु मे देव सर्वकार्येषु सर्वदा ॥ </h3>
+    
+    <p class="large">“Oh! Lord (Ganesha), of huge body and curved elephant trunk, whose brilliance is equal to billions of suns, always remove all obstacles from my endeavors.”</p>
+  
   </div>
   <div class="col-lg-4 callout"> <i class="fa fa-users fa-3x"></i>
     <h3>Engagement</h3>
@@ -213,7 +225,7 @@ function onGalleryImageClicked(location,title,desc){
 
   <h2 class="centered">ABOUT US</h2>
   <hr>
-  <div class="col-md-6"> <img class="img-responsive" src="{% static 'ramWedsSita/images/about/about2.jpeg' %}" align=""> </div>
+  <div class="col-md-6 "> <img class="img-responsive" src="{% static 'ramWedsSita/images/about/about2.jpeg' %}" align=""> </div>
   <div class="col-md-6">
     <h3>Groom</h3>
     <p >Hi! I am Ram Sharma currently pursing my job at Yeti International. I have completed my masters in MBA and bachelors in Computer Science.<br/>
@@ -375,9 +387,9 @@ function onGalleryImageClicked(location,title,desc){
   <div class="container">
     <div class="highlight tb">
       <div class="tb-cell">
-        <form class="form-inline pull-center" name="wishForm" action="{% url 'home' %}" method="POST" onsubmit = "return(validate());">{% csrf_token %}
+        <form class="form-inline pull-center" name="wishForm" action="{% url 'home-rs' %}" method="POST" onsubmit = "return(validate());">{% csrf_token %}
           <div class="form-group">
-            <textarea class="form-control " id="wishField" name="Wish" placeholder="Wishes . . . " rows="4" cols="50" required ></textarea>       
+            <textarea class="form-control" id="wishField" name="Wish" placeholder="Wishes . . . " rows="4" cols="50" required ></textarea>       
             <button class="btn btn-lg" id="btnwish" type="submit">Submit wish</button>
           </div>
               
@@ -434,6 +446,5 @@ function onGalleryImageClicked(location,title,desc){
 </div>
 
 {%endblock foottail%}
-
 
 
