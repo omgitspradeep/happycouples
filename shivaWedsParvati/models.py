@@ -13,13 +13,12 @@ GENDER_CHOICES =(
     ("Mr. ","Male"),("Ms. ","Female"),
 )
 
-
-class InviteeRS(models.Model):
+class InviteeSP(models.Model):
     name = models.CharField(max_length=20)
     gender = models.CharField(max_length=6,choices=GENDER_CHOICES)
     address = models.CharField(max_length=50)
     inviteStatus = models.CharField( max_length = 20, choices = INVITE_CHOICES, default = 'W')
-    inviteeMessage = models.TextField(max_length=500,blank=True, default="Mr. Bhaktaraj Bashyal and Mrs. Haridevi Bashyal request the honour of your presence on the auspicious occassion of the marriage ceremony of their son.")
+    inviteeMessage = models.TextField(max_length=500,blank=True, default="You are cordially invited to the beautiful ceremony of my wedding. Your blessings matter the most to us!")
     siteVisited = models.BooleanField(default=False)
     secretCode = models.CharField(max_length=10, blank=True, editable=False, unique=True)
 
@@ -30,7 +29,7 @@ class InviteeRS(models.Model):
         return self.name
 
     def URL(self):
-        baseUrl="https://happycouples.herokuapp.com/rs/"
+        baseUrl="https://happycouples.herokuapp.com/sp/"
         return baseUrl+self.secretCode
 
     
@@ -44,7 +43,7 @@ class InviteeRS(models.Model):
         failures = 0
         while not success:
             try:
-                super(InviteeRS, self).save(*args, **kwargs)
+                super(InviteeSP, self).save(*args, **kwargs)
             except IntegrityError:
                  failures += 1
                  if failures > 5: # or some other arbitrary cutoff point at which things are clearly wrong
@@ -58,30 +57,30 @@ class InviteeRS(models.Model):
 
     # To get wishes by Invitees if exists.
     def getWishIfExists(self):
-        wish = WisherRS.objects.filter(invitee=self)
+        wish = WisherSP.objects.filter(invitee=self)
         if(wish.exists()):
             return wish[0].wishes
         else: 
             return ""
-      
+        
 
-class WisherRS(models.Model):
+class WisherSP(models.Model):
     # When we delete Invitee, then both Wisher and Invitee will be deleted.
-    invitee = models.OneToOneField(InviteeRS,on_delete=models.CASCADE)
+    invitee = models.OneToOneField(InviteeSP,on_delete=models.CASCADE)
     wishes = models.CharField(max_length=500)
     posted = models.DateTimeField(auto_now=True)
 
     def Name(self):
         return self.invitee.name
     
-    def InviteeRS(self):
+    def InviteeSP(self):
         return self.invitee
 
 
 def generateSecretCode():
     random = secrets.token_hex(16)
     # Get all the secretCodes to verify
-    all= [obj.secretCode for obj in InviteeRS.objects.all()]
+    all= [obj.secretCode for obj in InviteeSP.objects.all()]
     if random in all:
         generateSecretCode()
     else:

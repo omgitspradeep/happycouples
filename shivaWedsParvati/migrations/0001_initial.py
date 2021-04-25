@@ -13,7 +13,7 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.CreateModel(
-            name='InviteeRS',
+            name='InviteeSP',
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('name', models.CharField(max_length=20)),
@@ -26,12 +26,12 @@ class Migration(migrations.Migration):
             ],
         ),
         migrations.CreateModel(
-            name='WisherRS',
+            name='WisherSP',
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('wishes', models.CharField(max_length=500)),
                 ('posted', models.DateTimeField(auto_now=True)),
-                ('invitee', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, to='ramWedsSita.inviteers')),
+                ('invitee', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, to='shivaWedsParvati.inviteesp')),
             ],
         ),
     ]

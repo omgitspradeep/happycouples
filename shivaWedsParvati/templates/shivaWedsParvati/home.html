@@ -1,0 +1,667 @@
+{% extends 'sp-base.html' %}
+{% load static %}
+{% get_static_prefix as STATIC_PREFIX %}
+
+
+
+<!-- ==== TITLE ==== -->
+
+{%block title%} 
+  Shiva weds Parvati|{{inviteeObj.name}}
+{%endblock title%}
+
+
+<!-- ==== JAVASCRIPT ==== -->
+{%block writescript%}
+
+
+
+//Code of ajax
+
+$(document).ready(function(){
+
+    // If User has already wished then Hide the Wish Submitting form
+    {% if alreadyWished == 1 %}
+      $("#wishFormSection").hide();
+    {% endif %}
+
+    $("#wishDelBtn").click(function(){
+
+      const xhr=new XMLHttpRequest();
+      xhr.open("GET","{% url 'home-sp' %}",true);
+      xhr.responseType="json";
+      xhr.onload=()=>{
+        if(xhr.status === 200){
+          console.log(xhr.response.status);
+
+          if (xhr.response.status=="1"){
+
+          // Remove the Deleted Wish 
+          $(this).closest('.card').fadeOut(2400, function(){
+            $(this).remove();
+          });
+          // Show the Wish form to accept Wishes
+          $("#wishFormSection").fadeOut(500, function(){
+            $(this).fadeIn(2500);
+
+          });
+          }
+
+        }else{
+          console.log("Some thing went wrong....");
+        }
+      };
+      xhr.send();
+
+  });  
+
+});
+
+
+
+function validate() {
+
+  var wish =  document.wishForm.wishField.value.trim(); 
+  if( wish.length < 3 ) {
+     alert( "Please provide your wishes" );
+     document.wishForm.wishField.focus() ;
+     return false;
+  }
+  return( true );
+}
+
+// Code for raining animation
+var count=0;   // 0: !raining &  1: raining
+var createHeartVar='';
+function createHeart(){
+
+    const heart = document.createElement('div');
+    heart.classList.add('heart');
+
+    heart.style.left = Math.random() * 100 + "vw";
+	  heart.style.color=`hsl(${Math.floor(Math.random()*360)}, 100%, 50%)`;
+
+    // to make animation between 2 to 5 seconds
+    heart.style.animationDuration = Math.random()*2 +3 +"s"
+    heart.innerText='🇳🇵🇳🇵 पार्वती ♥️ शिव 🇳🇵🇳🇵';
+    document.body.appendChild(heart);
+
+    setTimeout(()=>{
+        heart.remove();
+    },5000);
+}
+function heartController(){
+  if (count === 0){
+    count=1;
+    createHeartVar=setInterval(createHeart,300);
+  }else{
+    count=0;
+    clearInterval(createHeartVar);
+  }
+
+}
+
+//setInterval(createHeart,300)
+
+// CODE TO REMEMBER CLICKED IMAGES OF GALLERY
+function onGalleryImageClicked(location,title,desc){
+  document.querySelector(".modal-title").innerHTML=title;
+  document.querySelector("#modal-desc").innerHTML=desc;
+  document.querySelector("#modal-image").src="{{STATIC_PREFIX}}"+location;
+
+}
+
+
+
+
+
+
+
+
+// GAME
+
+
+document.addEventListener('DOMContentLoaded',()=>{
+
+
+
+    //GAME
+  
+    const mirrorList = [
+          {
+            name:'bride',
+            img:"{% static 'shivaWedsParvati/images/game/bride.png' %}"
+        },{
+            name:'groom',
+            img:"{% static 'shivaWedsParvati/images/game/groom.png' %}"
+        },{
+            name:'brown',
+            img:"{% static 'shivaWedsParvati/images/game/brown.png' %}"
+        },{
+            name:'green',
+            img:"{% static 'shivaWedsParvati/images/game/green.png' %}"
+        },{
+            name:'blue',
+            img:"{% static 'shivaWedsParvati/images/game/blue.png' %}"
+        },{
+            name:'ocean',
+            img:"{% static 'shivaWedsParvati/images/game/ocean.png' %}"
+        },{
+            name:'pink',
+            img:"{% static 'shivaWedsParvati/images/game/pink.png' %}"
+        },{
+            name:'bride',
+            img:"{% static 'shivaWedsParvati/images/game/bride.png' %}"
+        },{
+            name:'ocean',
+            img:"{% static 'shivaWedsParvati/images/game/ocean.png' %}"
+        },{
+            name:'brown',
+            img:"{% static 'shivaWedsParvati/images/game/brown.png' %}"
+        },{
+            name:'twitter',
+            img:"{% static 'shivaWedsParvati/images/game/twitter.png' %}"
+        },{
+            name:'green',
+            img:"{% static 'shivaWedsParvati/images/game/green.png' %}"
+        },{
+            name:'pink',
+            img:"{% static 'shivaWedsParvati/images/game/pink.png' %}"
+        },{
+            name:'twitter',
+            img:"{% static 'shivaWedsParvati/images/game/twitter.png' %}"
+        },{
+            name:'groom',
+            img:"{% static 'shivaWedsParvati/images/game/groom.png' %}"
+        },{
+            name:'blue',
+            img:"{% static 'shivaWedsParvati/images/game/blue.png' %}"
+        }
+    ]
+  
+  
+  
+      const stage=document.querySelector('.mygrid');
+      const chance=document.querySelector('#chance');
+      const highscoreRecord= document.querySelector('#scoreRecord');
+      const result= document.querySelector('#score');
+  
+      var selectedMirrorNames=[]
+      var selectedMirrorIds=[]
+      var wonMirrors=[]
+  
+      let chanceCounter=0;
+    mirrorList.sort( () => 0.5 - Math.random() );
+  
+  
+  
+      if(! localStorage.getItem('highscore')){
+          setHighScoreContent('Chrome','60')
+      }
+      highscoreRecord.textContent=getHighScoreContent();
+  
+  
+  
+      // Called to display the deck of cards to select from
+      function playground(){    
+  
+          for (var i = 0; i < mirrorList.length; i++) {
+              const mirror=document.createElement('img');
+              mirror.setAttribute('mirror-id',i);
+              mirror.setAttribute('src', "{% static 'shivaWedsParvati/images/game/blank.png' %}");
+              mirror.addEventListener('click', flipMirror);
+              stage.appendChild(mirror);
+          }
+      }
+  
+      // called whenever a card is clicked
+      function flipMirror(){
+          const selectedMirrorID=this.getAttribute('mirror-id');
+          const selectedMirrorName=mirrorList[selectedMirrorID].name;
+  
+          if(!isItTwiceClicked(selectedMirrorID,selectedMirrorName)){
+              chanceCounter++;
+              chance.textContent=chanceCounter;
+              this.setAttribute('src',mirrorList[selectedMirrorID].img);
+              selectedMirrorNames.push(selectedMirrorName);
+              selectedMirrorIds.push(selectedMirrorID);
+              if (selectedMirrorIds.length === 2) {
+                  setTimeout(matchMirrors,500);
+              }
+          }
+      }
+  
+      // Called when two cards are selected
+      function matchMirrors(){
+          var allMirrors= stage.querySelectorAll('img');
+          if(selectedMirrorNames[0] === selectedMirrorNames[1]){
+              wonMirrors.push(selectedMirrorNames[0]);
+              console.log("Match found");
+              result.textContent=wonMirrors.length;
+              allMirrors[selectedMirrorIds[0]].setAttribute('src',"{% static 'shivaWedsParvati/images/game/white.png' %}");
+              allMirrors[selectedMirrorIds[1]].setAttribute('src',"{% static 'shivaWedsParvati/images/game/white.png' %}");
+              if( wonMirrors.length === mirrorList.length/2){
+                  
+                  result.textContent= "बधाई छ! तपाईंले खेल जित्नुभयो !";
+                  if(localStorage.getItem('highscore') >= chanceCounter){
+                      var winner = prompt("तपाईंको नाम के होला?")
+                      setHighScoreContent(winner,chanceCounter)
+                  }
+                  hideStage();
+  
+              }
+  
+          }else{
+              allMirrors[selectedMirrorIds[0]].setAttribute('src',"{% static 'shivaWedsParvati/images/game/blank.png' %}");
+              allMirrors[selectedMirrorIds[1]].setAttribute('src',"{% static 'shivaWedsParvati/images/game/blank.png' %}");
+          }
+          selectedMirrorNames=[]
+          selectedMirrorIds=[]
+      }
+  
+      // to stop clicking same element twice
+      function isItTwiceClicked(mirrorId,name){
+  
+          if(isMirrorAlreadyWon(name)){
+              return true;
+          }else{
+              return selectedMirrorIds.includes(mirrorId);
+          }
+      }
+  
+      // to check if clicked card is already won card.
+      function isMirrorAlreadyWon(name){
+          return wonMirrors.includes(name);
+      }
+  
+      //
+      function getHighScoreContent(){
+          return `${localStorage.getItem('player')}   :  ${localStorage.getItem('highscore')} `
+      }
+  
+      function setHighScoreContent(player,chances){
+          localStorage.setItem('highscore',chances);
+          localStorage.setItem('player',player);
+          highscoreRecord.textContent=getHighScoreContent();
+  
+      }
+  
+      // to remove all the images after game is over.
+      function hideStage(){
+          stage.style.display = "none";
+      }
+  
+  
+  
+  playground();
+  
+  
+  
+  
+});
+
+
+{%endblock writescript%}
+
+
+<!-- ==== NAVBAR ==== -->
+{%block navbar%}
+
+<div class="navbar-header">
+  <div class="pull-left logo">
+    <a class="" onhover = "cursor: pointer;" onclick = "return(heartController());"><img src="{% static 'shivaWedsParvati/images/sitaram.png' %}" /></a>
+  </div>
+  <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse"> <span class="icon-bar"></span> <span class="icon-bar"></span> <span class="icon-bar"></span> </button>
+</div>
+
+<div class="navbar-collapse collapse">
+  <ul class="nav navbar-nav pull-right">
+    <li><a href="#home-section" class="smoothScroll">Welcome</a></li>
+    <li> <a href="#services" class="smoothScroll">Events</a></li>		  
+    <li> <a href="#about" class="smoothScroll"> About Us</a></li>
+    <li> <a href="#portfolio" class="smoothScroll"> Gallery</a></li>
+    <li> <a href="#team" class="smoothScroll">Testimonials</a></li>
+    <li> <a href="#contact" class="smoothScroll"> Place</a></li>
+    <li> <a href="#wishes" class="smoothScroll"> Wishes</a></li>
+    <li> <a href="#game" class="smoothScroll"> Game</a></li>
+
+    
+  </ul>
+</div>
+
+{%endblock navbar%}
+
+
+
+<!-- ==== HEADERWRAP ==== -->
+
+{%block headwrap%}
+  <h2 style="color:white;">Shiva & Parvati </h2>
+  <h1 style="color:black">We are getting married on 20.12.2021</h1>
+{%endblock headwrap%}
+
+
+
+
+
+<!-- ==== EVENTS ==== -->
+
+{%block services%}
+  <h2 class="centered">EVENTS</h2>
+  <hr>
+  <div class="col-lg-8 col-lg-offset-2">
+    <img src="{% static 'ramWedsSita/images/ganesh.png' %}" alt="Ganesh Image" width="200" height="200">
+    <h3> वक्रतुंड महाकाय कोटिसूर्यसमप्रभ । निर्विघ्नं कुरु मे देव सर्वकार्येषु सर्वदा ॥ </h3>
+    
+    <p class="large">“Oh! Lord (Ganesha), of huge body and curved elephant trunk, whose brilliance is equal to billions of suns, always remove all obstacles from my endeavors.”</p>
+    </div>
+  <div class="col-lg-4 callout"> <i class="fa fa-users fa-3x"></i>
+    <h3>Engagement</h3>
+    <p> Friday, 2077 - 08 - 26 (11<sup>th</sup> December 2020)</p>
+  </div>
+  <div class="col-lg-4 callout"> <i class="fa fa-bell fa-3x"></i>
+    <h3>Wedding Day</h3>
+    <p>Sunday, 2078 - 09 - 05 (20<sup>th</sup> December 2020) <br/>
+      Janti Prasthan - 10 a.m <br/>
+      Suddhodhan-3, Bethani, Rupandehi
+    </p>
+
+  </div>
+  <div class="col-lg-4 callout"> <i class="fa fa-star fa-3x"></i>
+    <h3>Reception</h3>
+    <p>Tuesday, 2077 - 09 - 07 (22<sup>nd</sup> December 2020)<br/>
+    From 3 P.M. to 8 P.M. <br/>
+    Riddi Siddhi Party Palace, Suddhodhan-1, Pharsatikar</p>
+  </div>
+
+{%endblock services%}
+
+
+
+<!-- Invitaion Message Section --> 
+
+{%block InvitationMessage%}
+  <div class="row col-sm-5">
+    <p><b>{{inviteeObj.gender}} {{inviteeObj.name}}</b>,</br>
+    {{inviteeObj.address}}</p>
+
+    <div class="form-check">
+      <input class="form-check-input" type="checkbox" value="" id="flexCheckChecked" checked>
+      <label class="form-check-label" for="flexCheckChecked">
+      <p><b>({{inviteeObj.inviteStatus}} )</b>
+      </label>
+</div>
+
+    
+
+  </div>
+  <div class="row col-sm-7 ">
+    <h4 class="text-info"> {{inviteeObj.inviteeMessage}}</h4>
+  </div>
+{%endblock InvitationMessage%}
+
+
+
+<!-- ==== ABOUT ==== -->
+
+{%block about%}
+
+  <h2 class="centered">ABOUT US</h2>
+  <hr>
+  <div class="col-md-6"> <img class="img-responsive" src="{% static 'shivaWedsParvati/images/about/about1.jpg' %}" align=""> </div>
+  <div class="col-md-6">
+    <h3>Groom</h3>
+    <p >Hi! I am Ram Sharma currently pursing my job at Yeti International. I have completed my masters in MBA and bachelors in Computer Science.<br/>
+    <b><i>Suddhodhan-3, Bethani, Rupandehi</i></b></p>
+      
+    <h3>Bride</h3>
+    <p>Hi! I am Neha Dahal currently working as leading architect in Lumbini Provinance. I have completed my masters in Civil Engineering from Oxford university.<br/>
+    <b><i>Butwal-18, Bethani, Rupandehi</i></b></p>
+  </div>
+
+{%endblock about%}
+
+
+
+<!-- ==== PORTFOLIO/ Gallary ==== -->
+
+{%block gallery%}
+
+<div class="row">
+  <h2 class="centered">GALLERY</h2>
+  <hr>
+  <div class="col-lg-8 col-lg-offset-2 centered">
+    <p class="large">These photos we shared with you are the best captured moments of our lives. We are looking forward to even more happy moments together.</p>
+  </div>
+</div>
+
+<!-- /row -->
+<div class="container">
+  <div class="row"> 
+    <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+            <h4 class="modal-title">Cake</h4>
+          </div>
+          <div class="modal-body">
+            <p><img id ="modal-image" class="img-responsive" ></p>
+            <p id="modal-desc"> Lorem ipsum dolor sit amet, quo meis audire placerat eu, te eos porro veniam. An everti maiorum detracto mea. </p> 
+          </div> 
+        </div>
+        <!-- /.modal-content --> 
+      </div>
+      <!-- /.modal-dialog --> 
+    </div>
+                <!-- /.modal --> 
+
+
+    {%for key,value in gallery.items%}
+        <!-- PORTFOLIO IMAGE 1 -->
+        <div class="col-md-4 ">
+          <div class="grid overlay">
+            <figure> <img class="img-responsive" src="{{STATIC_PREFIX}}{{value.image}}" alt="">
+              <figcaption>
+                <h5>{{key}}</h5>
+                <a data-toggle="modal" href="#myModal" onclick="return(onGalleryImageClicked('{{value.image}}','{{key}}','{{value.desc}}'));" class="btn btn-default">More Details</a> </figcaption>
+              <!-- /figcaption --> 
+            </figure>
+            <!-- /figure --> 
+          </div>
+          <!-- /grid-overlay --> 
+        </div>
+    {%endfor%}
+
+    <!-- /col --> 
+  </div>
+  <!-- /row --> 
+</div>
+<!-- /row --> 
+{%endblock gallery%}
+
+        
+
+
+
+
+
+<!-- ==== Testimonials ==== -->
+
+{%block testimonials%}
+
+<div class="row centered">
+  <h2 class="centered">TESTIMONIALS</h2>
+  <hr>
+	<div class="col-lg-8 col-lg-offset-2 centered">
+    <p>No relationship is all sunshine, but two people can share one umbrella and survive the storm together.</p>
+	  <br/>
+  </div>
+      
+  {%for keys,values in testi.dadmom.items%}
+    <div class="col-lg-3 centered"> <img class="img img-circle" src="{{STATIC_PREFIX}}{{values.image}}" height="120px" width="120px" alt="">
+      <h4><strong>{{values.name}}</strong></h4>
+      <p>  {{values.desc}}</p>  
+    </div>
+  {%endfor%}
+
+</div>
+<br/>
+
+<table class="table">
+  {%for keys,values in testi.others.items%}
+    <thead>
+      <tr>
+        <th scope="col" class="text-body">{{keys}}</th>
+        <th scope="col" style="font-size: 1.4rem;">{{values}} </th>
+      </tr>
+    </thead>
+  {%endfor%}
+
+</table>
+
+{%endblock testimonials%}
+
+
+<!-- ==== MEETING POINT / PLACE ==== -->
+
+{%block place%}
+
+<div class="row">
+  <h2 class="centered">MEETING POINT</h2>
+  <hr>
+</div>
+
+<div class="row">
+  <div class="col-md-7">
+	  <strong>Ask how to Reach Us!</strong>
+    <p>Once you get Bethani, take Lumbini circuit road leading to West direction. Once you reach a Siyari river then take road towards North that leads directly to marriage location. </p>
+        
+    <!--Google map भेला स्थल-->
+    <div id="map-container-google-1" class="z-depth-1-half map-container" style="height: 500px">
+      <iframe src="https://maps.google.com/maps?q=27.626931778006565, 83.41662629452786&t=&z=13&ie=UTF8&iwloc=&output=embed" frameborder="0" style="border:0" allowfullscreen></iframe>
+    </div>
+    <!--Google Maps -->
+ 
+  </div>
+	
+  <div class="col-md-5">         
+	  <i class="fa fa-map-marker fa-2x"></i>
+    <strong>Gautam Buddha Party Palace</strong>
+	  <p>Butwal-18, Bethani<br>Rupandehi,Nepal</p><br/> 
+	  <i class="fa fa-envelope-o fa-2x"></i>
+    <p>binary.science98@gmail.com</p><br/> 
+	  <i class="fa fa-phone fa-2x"></i>
+    <p> +977-9863949531</p>     
+	</div>
+</div>
+
+{%endblock place%}
+  
+    
+
+
+<!-- ==== WISHES ==== -->
+
+{%block inviteewish%}
+
+<h2 class="centered">Your Best Wishes</h2><hr>
+<section class="hero-section section" id ="wishFormSection">  
+  <div class="container">
+    <div class="highlight tb">
+      <div class="tb-cell">
+        <form class="form-inline pull-center" name="wishForm" action="{% url 'home-sp' %}" method="POST" onsubmit = "return(validate());">{% csrf_token %}
+          <div class="form-group">
+            <textarea class="form-control" id="wishField" name="Wish" placeholder="Wishes . . . " rows="4" cols="50" required ></textarea>       
+            <button class="btn btn-lg" id="btnwish" type="submit">Submit wish</button>
+          </div>
+              
+        </form> 
+      </div>
+    </div>
+  </div>    
+</section>
+
+
+<!-- Open a whole column of wish display -->
+
+
+<div class="row" id="wishDisplaySection">
+
+  {% if wishes %}
+    {%for wish in wishes %}
+      <div class="col-sm-4">
+        <div class="card">
+          <div class="card-body ">
+            <h4 class="card-title ">{{wish.invitee.name}}</h4>
+            <div class="card-text bg-success">
+              {{wish.wishes}}<br/>
+              {% if wish.invitee.secretCode == request.session.guestsession %}
+                <a id="wishDelBtn" class="trans-btn"><i class="fa fa-trash-o fa-2x"></i></a>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      </div>
+    {%endfor%}
+  {%endif%}
+          
+</div>
+      <!-- Closes a whole column of wish display -->
+
+{%endblock inviteewish%}
+
+<!-- Ends wish section-->
+
+
+
+
+{%block knowUsGame%}
+
+
+
+
+<h2 class="centered" style="background: azure;" ><b>Know Us Through Game</b></h2>
+  <hr>
+  <div class="col-md-6"> 
+    <div class="mygrid"> </div>
+  </div>
+  <div class="col-md-6 game-text">
+    <h3>Score: <span id="score">0</span> </h3>
+
+    <h3>Chance: <span id="chance">0</span> </h3>
+
+    <h3>Highscrore ( <span id="scoreRecord" ></span> ) </h3>
+
+    <h3><mark>How to play:</mark> </h3>
+    <h4>&nbsp;&nbsp;<mark>Click the cards and try to match two cards consecutively.</mark></h4>
+
+  </div>
+
+
+
+
+
+
+
+
+
+{%endblock knowUsGame%}
+
+
+<!-- *** Footer *** -->
+{%block foottail%}
+<div class="col-md-8"> <span class="copyright">Love, laughter and happily ever after.</span> </div>
+<div class="col-md-4">
+  <ul class="list-inline social-buttons">
+    <li><a href="#"><i class="fa fa-twitter fa-2x"></i></a> </li>
+    <li><a href="https://www.facebook.com/osho.international/"><i class="fa fa-facebook fa-2x"></i></a> </li>
+    <li><a href="https://www.youtube.com/watch?v=966WaMFgV1k"><i class="fa fa-youtube fa-2x"></i></a> </li>
+    <li><a href="#"><i class="fa fa-linkedin fa-2x"></i></a> </li>
+  </ul>
+</div>
+
+{%endblock foottail%}
+
+
+
